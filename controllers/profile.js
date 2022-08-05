@@ -24,7 +24,7 @@ export const updateProfile = async (req, res, next) => {
 
     if (req?.file) {
       if (profileImg.length) {
-        const path = `uploads\\profile\\${profileImg.split("/").slice(-1)[0]}`;
+        const path = `./uploads/profile/${profileImg.split("/").slice(-1)[0]}`;
         fs.unlink(path, (err) => err && console.log(err));
       }
 
