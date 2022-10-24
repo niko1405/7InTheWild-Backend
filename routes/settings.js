@@ -3,16 +3,15 @@ import multer from "multer";
 import { v4 as uuidv4 } from "uuid";
 
 import {
-  updateProfile,
-  getProfile,
-  setFavorit,
-  getFavorits,
-  searchProfiles,
-} from "../controllers/profile.js";
+  changeLiveChatSettings,
+  getLiveChatSettings,
+  getNotifications,
+  setNotifications,
+} from "../controllers/settings.js";
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, "./uploads/profile");
+    cb(null, "./uploads/chat");
   },
   filename: function (req, file, cb) {
     cb(
@@ -32,10 +31,13 @@ const upload = multer({ storage, fileFilter });
 
 const router = Router();
 
-router.get("/", getProfile);
-router.patch("/search", searchProfiles);
-router.get("/favorits", getFavorits);
-router.patch("/favorit/:userId", setFavorit);
-router.post("/upload/:userId", upload.single("profileImg"), updateProfile);
+router.get("/chat/:userId", getLiveChatSettings);
+router.get("/notifications/:userId", getNotifications);
+router.patch("/notifications/:userId", setNotifications);
+router.patch(
+  "/chat/:userId",
+  upload.single("chatImage"),
+  changeLiveChatSettings
+);
 
 export default router;

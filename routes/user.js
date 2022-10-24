@@ -10,7 +10,11 @@ import {
   getUser,
   existUser,
   updateUser,
-} from "../controllers/auth.js";
+  setPushToken,
+  getPushToken,
+  changeLocation,
+  changeNotifications,
+} from "../controllers/user.js";
 
 const router = Router();
 
@@ -23,5 +27,9 @@ router.patch("/updateUser/:userId", updateUser);
 router.post("/changePassword", changePassword);
 router.get("/deleteAcc/:id", deleteAccount);
 router.post("/changeUsername/:id", changeUsername);
+router.patch("/token/:userId", setPushToken);
+router.get("/token/:userId", getPushToken);
+router.patch("/location/:userId", changeLocation);
+router.patch("/notifications/:userId", changeNotifications);
 
 export default router;

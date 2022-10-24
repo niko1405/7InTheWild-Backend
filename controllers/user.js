@@ -1,18 +1,11 @@
 import bcrypt from "bcryptjs";
+import { v4 as uuidv4 } from "uuid";
 
+import cloudinary from "../cloud/index.js";
 import User from "../models/user.js";
 
 export const signup = async (req, res) => {
   const { email, userName, password } = req.body;
-
-  const makeId = () => {
-    let ID = "";
-    let characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    for (var i = 0; i < 12; i++) {
-      ID += characters.charAt(Math.floor(Math.random() * 36));
-    }
-    return ID;
-  };
 
   try {
     if (await User.findOne({ email })) {
@@ -34,12 +27,17 @@ export const signup = async (req, res) => {
       userName,
       password: hashedPassword,
       profileImg: "",
-      // publicImageId: '',
+      settings: {
+        liveChat: {
+          fontStyle: "Cracked",
+          theme: "Standard",
+          customTheme: "Standard",
+          chatImage: "",
+        },
+      },
       description: "",
-      // posts: [],
-      // follower: [],
-      // follows: [],
-      _id: makeId(),
+      pushToken: "",
+      _id: uuidv4(),
     }).catch((error) => console.log(error));
 
     res.status(200).json({
@@ -48,7 +46,7 @@ export const signup = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({
-      message: "Etwas ist schiefgelaufen. Bitte versuche es später erneut.",
+      message: "Ein Fehler ist aufgetreten. Bitte versuche es später erneut.",
     });
   }
 };
@@ -92,7 +90,7 @@ export const login = async (req, res) => {
     res.status(200).json({ message: "Erfolgreich eingeloggt!", result: user });
   } catch (error) {
     res.status(500).json({
-      message: "Etwas ist schiefgelaufen. Bitte versuche es später erneut.",
+      message: "Ein Fehler ist aufgetreten. Bitte versuche es später erneut.",
     });
   }
 };
@@ -108,12 +106,15 @@ export const googleSignIn = async (req, res) => {
         email,
         userName: given_name,
         profileImg: picture,
-        // publicImageId: '',
+        settings: {
+          liveChat: {
+            fontStyle: "erdoded2",
+            theme: "default",
+            customTheme: "Standard",
+            chatImage: "",
+          },
+        },
         description: "",
-        // posts: [],
-        // follower: [],
-        // follows: [],
-        // chats: [],
         _id: sub,
       }).catch((error) => console.log(error));
 
@@ -128,7 +129,7 @@ export const googleSignIn = async (req, res) => {
       });
   } catch (error) {
     res.status(500).json({
-      message: "Etwas ist schiefgelaufen. Bitte versuche es später erneut.",
+      message: "Ein Fehler ist aufgetreten. Bitte versuche es später erneut.",
     });
   }
 };
@@ -150,7 +151,7 @@ export const getUser = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({
-      message: "Etwas ist schiefgelaufen. Bitte versuche es später erneut.",
+      message: "Ein Fehler ist aufgetreten. Bitte versuche es später erneut.",
     });
   }
 };
@@ -174,7 +175,7 @@ export const existUser = async (req, res) => {
     res.status(200).json({ result: user });
   } catch (error) {
     res.status(500).json({
-      message: "Etwas ist schiefgelaufen. Bitte versuche es später erneut.",
+      message: "Ein Fehler ist aufgetreten. Bitte versuche es später erneut.",
     });
   }
 };
@@ -194,7 +195,7 @@ export const changePassword = async (req, res) => {
     res.json({ message: "Passwort erfolgreich geändert." });
   } catch (error) {
     res.status(422).json({
-      message: "Etwas ist schiefgelaufen. Bitte versuche es später erneut.",
+      message: "Ein Fehler ist aufgetreten. Bitte versuche es später erneut.",
     });
   }
 };
@@ -210,7 +211,8 @@ export const updateUser = async (req, res) => {
 
     if (!user)
       return res.status(404).json({
-        message: "Etwas ist schiefgelaufen. Bitte versuche es später erneut.",
+        message:
+          "Änderungen konnten nicht gespeichert werden. Versuche es später erneut.",
       });
 
     if (newPassword.length) {
@@ -253,12 +255,12 @@ export const updateUser = async (req, res) => {
 
     res.status(200).json({
       result: updatedUser,
-      message: "Änderungen erfolgreich gespeichert!",
     });
   } catch (error) {
     console.log(error);
     res.status(500).json({
-      message: "Etwas ist schiefgelaufen. Bitte versuche es später erneut.",
+      message:
+        "Änderungen konnten nicht gespeichert werden. Versuche es später erneut.",
     });
   }
 };
@@ -269,34 +271,10 @@ export const deleteAccount = async (req, res) => {
   try {
     const user = await User.findById(id);
 
-    // const userPosts = await PostMessage.find({ creator: id });
+    const public_id = user?.profileImg?.public_id;
 
-    //delete all post image data from user
-    // userPosts.length && userPosts.forEach(async userPost => {
-    //     const public_id = userPost.publicFileId;
+    if (public_id) await cloudinary.uploader.destroy(public_id);
 
-    //     if (public_id && public_id?.length) {
-    //         cloudinary.uploader.destroy(public_id);
-    //         await userPost.remove();
-    //     }
-    // });
-
-    //delete user profile image
-    // if (user.publicImageId && user.publicImageId?.length) {
-    //     cloudinary.uploader.destroy(user.publicImageId);
-    // }
-
-    //delete user from other user's follower/following lists
-    // const affectedUsers = await User.find({ $or: [{ follower: { $in: user._id } }, { follows: { $in: user._id } }] });
-
-    // affectedUsers.length && affectedUsers.forEach(async affUser => {
-    //     await affUser.updateOne({
-    //         follower: affUser.follower.filter(followerId => followerId !== user._id),
-    //         follows: affUser.follows.filter(followsId => followsId !== user._id)
-    //     });
-    // });
-
-    //remove user
     await user.remove();
 
     res.json({
@@ -304,7 +282,7 @@ export const deleteAccount = async (req, res) => {
     });
   } catch (error) {
     res.status(422).json({
-      message: "Etwas ist schiefgelaufen. Bitte versuche es später erneut.",
+      message: "Ein Fehler ist aufgetreten. Bitte versuche es später erneut.",
     });
   }
 };
@@ -327,7 +305,71 @@ export const changeUsername = async (req, res) => {
     res.json({ message: `Du hast dein Benutzername erfolgreich geändert.` });
   } catch (error) {
     res.status(422).json({
-      message: "Etwas ist schiefgelaufen. Bitte versuche es später erneut.",
+      message: "Ein Fehler ist aufgetreten. Bitte versuche es später erneut.",
+    });
+  }
+};
+
+export const setPushToken = async (req, res) => {
+  const { userId } = req.params;
+  const { token } = req.body;
+
+  try {
+    await User.findByIdAndUpdate(userId, { pushToken: token });
+
+    res.status(200).json({ token });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: "Ein Fehler ist aufgetreten.",
+    });
+  }
+};
+
+export const getPushToken = async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const user = await User.findById(userId, { pushToken: 1 }).lean();
+
+    res.status(200).json({ token: user.pushToken });
+  } catch (error) {
+    res.status(500).json({
+      message: "Ein Fehler ist aufgetreten.",
+    });
+  }
+};
+
+export const changeLocation = async (req, res) => {
+  const { userId } = req.params;
+  const { location } = req.body;
+
+  try {
+    await User.findByIdAndUpdate(userId, { currentLocation: location });
+
+    res.status(200).json({ location });
+  } catch (error) {
+    res.status(500).json({
+      message: "Ein Fehler ist aufgetreten.",
+    });
+  }
+};
+
+export const changeNotifications = async (req, res) => {
+  const { userId } = req.params;
+  const { notifications } = req.body;
+
+  try {
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { notifications },
+      { new: true }
+    );
+
+    res.status(200).json({ result: user });
+  } catch (error) {
+    res.status(500).json({
+      message: "Ein Fehler ist aufgetreten.",
     });
   }
 };
