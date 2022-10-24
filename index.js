@@ -33,8 +33,6 @@ app.use("/news", newsRoutes);
 app.use("/post", postRoutes);
 app.use("/daily-survey", dailySurveyRoutes);
 
-app.use("/uploads", express.static("./uploads"));
-
 app.get("/", (req, res) => res.send("Welcome to 7InTheWild API"));
 
 const PORT = process.env.PORT || 5000;
