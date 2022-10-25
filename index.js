@@ -43,7 +43,7 @@ mongoose.connect(
   (err) => {
     if (err) return console.log(err.message);
     const server = app.listen(PORT, () => {
-      console.log(`Server running on Port ${PORT}`);
+      console.log(`Server running on Port ${PORT}!`);
     });
 
     const io = new Server(server, {
