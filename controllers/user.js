@@ -26,17 +26,6 @@ export const signup = async (req, res) => {
       email,
       userName,
       password: hashedPassword,
-      profileImg: "",
-      settings: {
-        liveChat: {
-          fontStyle: "Cracked",
-          theme: "Standard",
-          customTheme: "Standard",
-          chatImage: "",
-        },
-      },
-      description: "",
-      pushToken: "",
       _id: uuidv4(),
     }).catch((error) => console.log(error));
 
@@ -105,16 +94,7 @@ export const googleSignIn = async (req, res) => {
       const newUser = await User.create({
         email,
         userName: given_name,
-        profileImg: picture,
-        settings: {
-          liveChat: {
-            fontStyle: "erdoded2",
-            theme: "default",
-            customTheme: "Standard",
-            chatImage: "",
-          },
-        },
-        description: "",
+        profileImg: { uri: picture, public_id: "" },
         _id: sub,
       }).catch((error) => console.log(error));
 
@@ -363,6 +343,24 @@ export const changeNotifications = async (req, res) => {
     const user = await User.findByIdAndUpdate(
       userId,
       { notifications },
+      { new: true }
+    );
+
+    res.status(200).json({ result: user });
+  } catch (error) {
+    res.status(500).json({
+      message: "Ein Fehler ist aufgetreten.",
+    });
+  }
+};
+
+export const getPremium = async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { premium: true },
       { new: true }
     );
 

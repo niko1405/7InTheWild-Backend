@@ -6,7 +6,7 @@ export const updateProfile = async (req, res) => {
   const { userId } = req.params;
   const { description, imageUrl } = req.body;
   const file = req.file;
-
+  console.log(file);
   try {
     const user = await User.findById(userId).lean();
 

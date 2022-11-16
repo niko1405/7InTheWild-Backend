@@ -11,9 +11,6 @@ import {
 } from "../controllers/profile.js";
 
 const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "./uploads/profile");
-  },
   filename: function (req, file, cb) {
     cb(
       null,

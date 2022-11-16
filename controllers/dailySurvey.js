@@ -14,7 +14,7 @@ export const createSurvey = async (req, res) => {
       createdAt: new Date().toISOString(),
       question: survey.question,
       options: survey.options,
-      title: "TÄgliche Umfrage",
+      title: "Tägliche Umfrage",
     });
 
     await newSurvey.save();

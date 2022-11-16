@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 
 import {
   changeLiveChatSettings,
+  changeTheme,
   getLiveChatSettings,
   getNotifications,
   setNotifications,
@@ -34,6 +35,7 @@ const router = Router();
 router.get("/chat/:userId", getLiveChatSettings);
 router.get("/notifications/:userId", getNotifications);
 router.patch("/notifications/:userId", setNotifications);
+router.patch("/theme/:userId", changeTheme);
 router.patch(
   "/chat/:userId",
   upload.single("chatImage"),

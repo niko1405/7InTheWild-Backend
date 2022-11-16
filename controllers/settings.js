@@ -103,3 +103,24 @@ export const getNotifications = async (req, res) => {
     });
   }
 };
+
+export const changeTheme = async (req, res) => {
+  const { userId } = req.params;
+  const { darkMode } = req.body;
+
+  try {
+    const user = await User.findById(userId);
+
+    user.settings = { ...user.settings, darkMode };
+
+    await user.save();
+
+    res.status(200).json({
+      darkMode,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Ein Fehler ist aufgetreten. Bitte versuche es später erneut.",
+    });
+  }
+};

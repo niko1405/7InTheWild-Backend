@@ -14,6 +14,7 @@ import {
   getPushToken,
   changeLocation,
   changeNotifications,
+  getPremium,
 } from "../controllers/user.js";
 
 const router = Router();
@@ -22,6 +23,7 @@ router.post("/login", login);
 router.post("/signup", signup);
 router.post("/googleSignIn", googleSignIn);
 router.get("/user/:userId", getUser);
+router.get("/premium/:userId", getPremium);
 router.patch("/user", existUser);
 router.patch("/updateUser/:userId", updateUser);
 router.post("/changePassword", changePassword);
